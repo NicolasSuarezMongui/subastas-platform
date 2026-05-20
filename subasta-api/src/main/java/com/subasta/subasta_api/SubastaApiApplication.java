@@ -1,0 +1,13 @@
+package com.subasta.subasta_api;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class SubastaApiApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(SubastaApiApplication.class, args);
+	}
+
+}
