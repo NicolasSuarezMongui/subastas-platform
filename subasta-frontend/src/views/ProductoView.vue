@@ -166,7 +166,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
 import { useProductosStore } from "../stores/productos";
 import { usePujasStore } from "../stores/pujas";
@@ -195,7 +195,21 @@ async function pujar() {
 }
 
 onMounted(() => {
-  productosStore.cargarProducto(route.params.id);
-  pujasStore.cargarPujas(route.params.id);
+  const productoId = Number(route.params.id);
+  productosStore.cargarProducto(productoId);
+  pujasStore.cargarPujas(productoId);
+
+  pujasStore.conectarWebSocket(productoId, (nuevaPuja) => {
+    // Agregar la nueva puja al inicio de la lista
+    pujasStore.pujas.unshift(nuevaPuja);
+    // Actualizar precio del producto en tiempo real
+    if (productosStore.productoActual) {
+      productosStore.productoActual.precioActual = nuevaPuja.monto;
+    }
+  });
+});
+
+onUnmounted(() => {
+  pujasStore.desconectarWebSocket();
 });
 </script>

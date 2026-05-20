@@ -7,6 +7,7 @@ export const usePujasStore = defineStore("pujas", () => {
   const loading = ref(false);
   const error = ref(null);
   const exito = ref(null);
+  let socket = null;
 
   async function cargarPujas(productoId) {
     loading.value = true;
@@ -32,5 +33,42 @@ export const usePujasStore = defineStore("pujas", () => {
     }
   }
 
-  return { pujas, loading, error, exito, cargarPujas, realizarPuja };
+  function conectarWebSocket(productoId, onPujaRecibida) {
+    if (socket) socket.close();
+
+    socket = new WebSocket("ws://localhost:8081/ws/pujas");
+
+    socket.onopen = () => {
+      console.log("WebSocket conectado");
+    };
+
+    socket.onmessage = (event) => {
+      const puja = JSON.parse(event.data);
+      if (puja.productoId === productoId) {
+        onPujaRecibida(puja);
+      }
+    };
+
+    socket.onerror = (e) => console.error("WebSocket error:", e);
+
+    socket.onclose = () => console.log("WebSocket desconectado");
+  }
+
+  function desconectarWebSocket() {
+    if (socket) {
+      socket.close();
+      socket = null;
+    }
+  }
+
+  return {
+    pujas,
+    loading,
+    error,
+    exito,
+    cargarPujas,
+    realizarPuja,
+    conectarWebSocket,
+    desconectarWebSocket,
+  };
 });
