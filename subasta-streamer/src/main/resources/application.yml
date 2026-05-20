@@ -1,0 +1,14 @@
+spring:
+    application:
+        name: subasta-streamer
+
+    kafka:
+        bootstrap-servers: localhost:19092
+        consumer:
+            group-id: streamer-group
+            auto-offset-reset: latest
+            key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+server:
+    port: 8081

@@ -38,7 +38,7 @@ public class KafkaConfig {
         return new DefaultKafkaProducerFactory<>(
             config,
             new StringSerializer(),
-            new org.springframework.kafka.support.serializer.JsonSerializer<>(kafkaObjectMapper)
+            new JsonSerializer<>(kafkaObjectMapper)
         );
     }
 
