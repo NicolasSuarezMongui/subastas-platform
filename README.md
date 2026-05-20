@@ -88,6 +88,9 @@ npm install
 npm run dev
 ```
 
+**4 - Open API collection:**
+Import the `subastas/` folder in Bruno via `File > Open Collection`.
+
 Frontend runs at `http://localhost:5173` - backend at `http://localhost:8080`.
 
 ## API Endpoints

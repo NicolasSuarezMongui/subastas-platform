@@ -1,0 +1,24 @@
+info:
+  name: Crear un producto
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: http://localhost:8080/api/productos
+  body:
+    type: json
+    data: |-
+      {
+        "nombre": "iPhone 15 Pro",
+        "descripcion": "Sellado, garantía de fábrica",
+        "precioBase": 500.00,
+        "fechaCierre": "2026-06-01T23:59:59"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

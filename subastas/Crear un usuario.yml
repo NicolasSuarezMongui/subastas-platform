@@ -1,0 +1,22 @@
+info:
+  name: Crear un usuario
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:8080/api/usuarios
+  body:
+    type: json
+    data: |-
+      {
+        "username": "juanito",
+        "email": "juanito@email.com"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
