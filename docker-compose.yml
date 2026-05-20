@@ -13,5 +13,47 @@ services:
       - mysql_data:/var/lib/mysql
     command: --server-id=1 --log-bin=mysql-bin --binlog-format=ROW --binlog-row-image=FULL
 
+  redpanda:
+    image: redpandadata/redpanda:latest
+    container_name: subasta-redpanda
+    networks:
+      - subasta-network
+    command:
+      - redpanda
+      - start
+      - --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr internal://redpanda:9092,external://localhost:19092
+      - --pandaproxy-addr internal://0.0.0.0:8082,external://0.0.0.0:18082
+      - --advertise-pandaproxy-addr internal://redpanda:8082,external://localhost:18082
+      - --schema-registry-addr internal://0.0.0.0:8081,external://0.0.0.0:18081
+      - --rpc-addr redpanda:33145
+      - --advertise-rpc-addr redpanda:33145
+      - --mode dev-container
+      - --smp 1
+      - --default-log-level=warn
+    ports:
+      - "19092:19092"
+      - "18082:18082"
+      - "18081:18081"
+    volumes:
+      - redpanda_data:/var/lib/redpanda/data
+
+  redpanda-console:
+    image: redpandadata/console:latest
+    container_name: subasta-console
+    networks:
+      - subasta-network
+    depends_on:
+      - redpanda
+    environment:
+      KAFKA_BROKERS: "redpanda:9092"
+    ports:
+      - "8090:8080"
+
+networks:
+  subasta-network:
+    driver: bridge
+
 volumes:
   mysql_data:
+  redpanda_data:
