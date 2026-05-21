@@ -54,7 +54,7 @@ subasta-platform/
 ## Roadmap
 
 - [x] **Phase 1** - Core auction functionality (OLTP + REST API + Vue frontend)
-- [ ] **Phase 2** - Real-time updates (Kafka + WebSockets via `subasta-streamer`)
+- [x] **Phase 2** - Real-time updates (Kafka + WebSockets via `subasta-streamer`)
 - [ ] **Phase 3** - Analytics pipeline (Debezium CDC + ClickHouse + Grafana dashboard)
 
 ## Getting Started

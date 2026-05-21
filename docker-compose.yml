@@ -2,6 +2,8 @@ services:
   mysql:
     image: mysql:8.0
     container_name: subasta-mysql
+    networks:
+      - subasta-network
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: subasta_db
@@ -50,6 +52,48 @@ services:
     ports:
       - "8090:8080"
 
+  debezium:
+    image: quay.io/debezium/server:2.7
+    container_name: subasta-debezium
+    networks:
+      - subasta-network
+    depends_on:
+      - redpanda
+      - mysql
+    volumes:
+      - ./config/debezium:/debezium/conf
+      - ./config/debezium/data:/debezium/data
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: subasta-clickhouse
+    networks:
+      - subasta-network
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: subasta-grafana
+    networks:
+      - subasta-network
+    depends_on:
+      - clickhouse
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_INSTALL_PLUGINS: grafana-clickhouse-datasource
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+
 networks:
   subasta-network:
     driver: bridge
@@ -57,3 +101,5 @@ networks:
 volumes:
   mysql_data:
   redpanda_data:
+  clickhouse_data:
+  grafana_data:
