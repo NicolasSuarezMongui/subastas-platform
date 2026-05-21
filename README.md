@@ -73,14 +73,28 @@ subasta-platform/
 docker compose up -d
 ```
 
-**2 - Start backend:**
+> **Note:** the `debezium` container may take 40-60 seconds to stabilize after MySQL is
+> ready. If it fails on first start, run `docker compose restart debezium`,
 
+**2 - Fix Debezium offset permissions (first time only):**
 ```bash
-cd subasta-api
-./mvnw spring-boot:run
+chmod 777 config/debezium/data
+docker compose restart debezium
 ```
 
-**3 - Start frontend:**
+**3 - Start backend services:**
+
+```bash
+# Terminal 1
+cd subasta-api
+./mvnw spring-boot:run
+
+# Terminal 2
+cd subasta-streamer
+./mbnw spring-boot:run
+```
+
+**4 - Start frontend:**
 
 ```bash
 cd subasta-frontend
@@ -88,10 +102,26 @@ npm install
 npm run dev
 ```
 
-**4 - Open API collection:**
+**5 - Open API collection:**
+
 Import the `subastas/` folder in Bruno via `File > Open Collection`.
 
-Frontend runs at `http://localhost:5173` - backend at `http://localhost:8080`.
+### Service URLs
+
+| Service | URL |
+|---|---|
+| Frontend | http://localhost:5173 |
+| API | http://localhost:8080 |
+| Streamer | http://localhost:8081 |
+| Redpanda Console | http://localhost:8090 |
+| Grafana | http://localhost:3000 |
+| ClickHouse | http://localhost:8123 |
+
+### Known Issues
+
+- **Debezium permissions:** The `config/debezium/data/` directory must have write permissions for the container. Run `chmod 777 config/debezium/data` if Debezium fails to start.
+- **MySQL network:** MySQL must be in `subasta-network` for Debezium to resolve the hostname. Verify with `docker network inspect subasta-platform_subasta-network`.
+- **Redpanda Connect:** The `mysql_cdc` input requires an Enterprise license. Use Debezium Server instead (already configured).
 
 ## API Endpoints
 
