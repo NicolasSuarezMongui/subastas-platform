@@ -175,6 +175,32 @@ WHERE JSONExtractString(payload, 'payload', 'op') IN ('c', 'r', 'u');
 
 > **Note:** These commands only need to be run once. ClickHouse will automatically consume new events from Kafka after setup.
 
+### Grafana - ClickHouse user setup
+
+For security, create a dedicated user for Grafana instead of using the default ClickHouse user:
+
+```bash
+docker exec -it subasta-clickhouse clickhouse-client
+```
+
+```sql
+CREATE USER grafana IDENTIFIED WITH plaintext_password BY 'grafana123';
+GRANT ALL ON subasta_analytics.* TO grafana;
+```
+
+Then configure the datasource in Grafana (`http://localhost:3000`) with:
+
+| Field | Valued |
+|---|---|
+| Server address | `clickhouse` |
+| Server port | `8123` |
+| Protocol | `HTTP` |
+| Username | `grafana` |
+| Password | `grafana123` |
+| Default database | `subasta_analytics` |
+
+> **Note:** The `default` ClickHouse user is read-only bu configuration. Always use the `grafana` user for external connections.
+
 ## API Endpoints
 
 | Method | Endpoint                    | Description          |
