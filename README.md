@@ -123,6 +123,58 @@ Import the `subastas/` folder in Bruno via `File > Open Collection`.
 - **MySQL network:** MySQL must be in `subasta-network` for Debezium to resolve the hostname. Verify with `docker network inspect subasta-platform_subasta-network`.
 - **Redpanda Connect:** The `mysql_cdc` input requires an Enterprise license. Use Debezium Server instead (already configured).
 
+## Analytics Setup (Phase 3)
+
+### ClickHouse - First time Setup
+
+After all containers are running, connect to ClickHouse and run the following commands:
+
+```bash
+docker exec -it subasta-clickhouse clickhouse-client
+```
+
+```sql
+CREATE DATABASE IF NOT EXISTS subasta_analytics;
+USE subasta_analytics;
+
+CREATE TABLE pujas_kafka (
+      payload String
+)
+ENGINE = Kafka
+SETTINGS
+      kafka_broker_list = 'redpanda:9092',
+      kafka_topic_list = 'dbz.subasta_db.pujas',
+      kafka_group_name = 'clickhouse-consumer',
+      kafka_format = 'JSONAsString';
+
+CREATE TABLE pujas_analytics (
+      id Int64,
+      producto_id Int64,
+      usuario_id Int64,
+      monto Float64,
+      created_at DateTime,
+      op String,
+      ingested_at DateTime DEFAULT now()
+)
+ENGINE = MergeTree()
+ORDER BY (created_at, producto_id);
+
+CREATE MATERIALIZED VIEW pujas_mv TO pujas_analytics AS
+SELECT
+      JSONExtractInt(payload, 'payload', 'after', 'id') AS id,
+      JSONExtractInt(payload, 'payload', 'after', 'producto_id') AS producto_id,
+      JSONExtractInt(payload, 'payload', 'after', 'usuario_id') AS usuario_id,
+      toFloat64(JSONExtractString(payload, 'payload', 'after', 'monto')) AS monto,
+      fromUnixTimestamp64Micro(
+            JSONExtractInt(payload, 'payload', 'after', 'created_at')
+      ) AS created_at,
+      JSONExtractString(payload, 'payload', 'op') AS op
+FROM pujas_kafka
+WHERE JSONExtractString(payload, 'payload', 'op') IN ('c', 'r', 'u');
+```
+
+> **Note:** These commands only need to be run once. ClickHouse will automatically consume new events from Kafka after setup.
+
 ## API Endpoints
 
 | Method | Endpoint                    | Description          |
