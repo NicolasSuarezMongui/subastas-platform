@@ -4,6 +4,9 @@ import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.*;
 import com.nimbusds.jwt.*;
 import com.subasta.subasta_api.model.Usuario;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +15,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @Component
+@Slf4j
 public class JwtService {
 
     @Value("${jwt.secret}")
@@ -41,6 +45,7 @@ public class JwtService {
             jwt.sign(signer);
             return jwt.serialize();
         } catch (Exception e) {
+            log.error("Error generando JWT: {}", e.getMessage(), e);
             throw new RuntimeException("Error generado JWT", e);
         }
     }
