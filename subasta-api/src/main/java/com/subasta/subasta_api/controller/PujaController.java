@@ -5,6 +5,7 @@ import com.subasta.subasta_api.dto.PujaResponse;
 import com.subasta.subasta_api.service.PujaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -16,6 +17,7 @@ public class PujaController {
     private final PujaService pujaService;
 
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public List<PujaResponse> listar(@PathVariable Long productoId) {
         return pujaService.listarPujasPorProducto(productoId)
                 .stream()
@@ -24,6 +26,7 @@ public class PujaController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<PujaResponse> pujar(
         @PathVariable Long productoId,
         @RequestBody PujaRequest request

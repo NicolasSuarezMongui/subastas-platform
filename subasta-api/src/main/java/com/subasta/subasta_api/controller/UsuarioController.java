@@ -4,6 +4,7 @@ import com.subasta.subasta_api.model.Usuario;
 import com.subasta.subasta_api.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -15,16 +16,19 @@ public class UsuarioController {
     private final UsuarioService usuarioService;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public List<Usuario> listar() {
         return usuarioService.listarTodos();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Usuario> buscar(@PathVariable Long id) {
         return ResponseEntity.ok(usuarioService.buscarPorId(id));
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Usuario> crear(@RequestBody Usuario usuario) {
         return ResponseEntity.status(201).body(usuarioService.crear(usuario));
     }
