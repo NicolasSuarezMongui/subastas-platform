@@ -27,3 +27,7 @@ spring:
 
 server:
   port: 8080
+
+jwt:
+  secret: "Z40J.dJc2-xw}Xw|$$5sb/O2#1M^.<7NUi3+!Q@(bvW"
+  expiration: 900 # 15 minutos en segundos
