@@ -67,6 +67,7 @@ public class PujaService {
         return pujaGuardada;
     }
 
+    @Transactional(readOnly = true)
     public List<Puja> listarPujasPorProducto(Long productoId) {
         return pujaRepository.findByProductoIdOrderByMontoDesc(productoId);
     }

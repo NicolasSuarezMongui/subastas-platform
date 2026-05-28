@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PujaRepository extends JpaRepository<Puja, Long> {
+    @Query("SELECT p FROM Puja p JOIN FETCH p.producto JOIN FETCH p.usuario WHERE p.producto.id = :productoId ORDER BY p.monto DESC")
     List<Puja> findByProductoIdOrderByMontoDesc(Long productoId);
 
     @Query("SELECT p FROM Puja p WHERE p.producto.id = :productoId ORDER BY p.monto DESC LIMIT 1")
